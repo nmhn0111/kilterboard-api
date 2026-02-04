@@ -2,8 +2,8 @@ services:
   - type: web
     name: kilterboard-api
     runtime: python
-    # echo를 사용하여 비밀번호를 stdin으로 전달
-    buildCommand: pip install -r requirements.txt && echo "${KILTER_PASSWORD}" | boardlib database kilter ./kilter.db --username ${KILTER_USERNAME}
+    # 스크립트를 사용하여 데이터베이스 다운로드
+    buildCommand: chmod +x setup_db.sh && pip install -r requirements.txt && ./setup_db.sh
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
