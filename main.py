@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+import os
 
 app = FastAPI(title="Kilterboard API")
 
@@ -15,8 +16,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# SQLite 데이터베이스 경로
-DB_PATH = Path("./kilter.db")
+# SQLite 데이터베이스 경로 - 여러 경로 시도
+def find_database():
+    """데이터베이스 파일 찾기"""
+    possible_paths = [
+        Path("./kilter.db"),
+        Path("/opt/render/project/src/kilter.db"),
+        Path("/app/kilter.db"),
+        Path(os.path.abspath("kilter.db")),
+    ]
+    for path in possible_paths:
+        if path.exists():
+            return path
+    return Path("./kilter.db")  # 기본 경로 반환
+
+DB_PATH = find_database()
 
 
 def get_db_connection() -> sqlite3.Connection:
@@ -190,12 +204,25 @@ def health_check():
         except:
             pass
 
+    # 추가 디버깅 정보
+    cwd = os.getcwd()
+    possible_paths = [
+        "./kilter.db",
+        "/opt/render/project/src/kilter.db",
+        "/app/kilter.db",
+    ]
+
     return {
         "status": "healthy" if db_exists else "unhealthy",
         "database_exists": db_exists,
         "database_path": str(DB_PATH),
         "database_size_mb": round(db_size / (1024 * 1024), 2),
-        "total_climbs": total_climbs
+        "total_climbs": total_climbs,
+        "debug": {
+            "cwd": cwd,
+            "possible_paths_checked": possible_paths,
+            "files_in_cwd": os.listdir(cwd)[:10] if os.path.exists(cwd) else []
+        }
     }
 
 
