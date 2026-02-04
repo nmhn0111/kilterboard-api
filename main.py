@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import boardlib
 
 app = FastAPI(title="Kilterboard API")
@@ -15,25 +14,21 @@ app.add_middleware(
 )
 
 
-class SearchRequest(BaseModel):
-    query: str
-
-
 @app.get("/")
 def read_root():
     return {"message": "Kilterboard API"}
 
 
-@app.post("/search")
-def search_problems(request: SearchRequest):
+@app.get("/search")
+def search_problems(query: str):
     """
     BoardLib를 사용하여 킬터보드 문제 검색
     """
     results = boardlib.api.query(
         table_name="climbs",
-        filters=[("name", "like", f"%{request.query}%")],
+        filters=[("name", "like", f"%{query}%")],
     )
-    return {"query": request.query, "results": results}
+    return {"query": query, "results": results}
 
 
 if __name__ == "__main__":
