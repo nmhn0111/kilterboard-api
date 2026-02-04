@@ -2,8 +2,15 @@ services:
   - type: web
     name: kilterboard-api
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    # echo를 사용하여 비밀번호를 stdin으로 전달
+    buildCommand: pip install -r requirements.txt && echo "${KILTER_PASSWORD}" | boardlib database kilter ./kilter.db --username ${KILTER_USERNAME}
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
+      - key: KILTER_USERNAME
+        sync: false
+        # Render 대시보드에서 Kilterboard 사용자 이름을 설정해야 합니다
+      - key: KILTER_PASSWORD
+        sync: false
+        # Render 대시보드에서 Kilterboard 비밀번호를 설정해야 합니다

@@ -10,3 +10,9 @@ ENV/
 *.egg-info/
 dist/
 build/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+kilter.db
