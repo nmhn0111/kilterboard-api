@@ -2,9 +2,10 @@ services:
   - type: web
     name: kilterboard-api
     runtime: python
-    # 스크립트를 사용하여 데이터베이스 다운로드
-    buildCommand: chmod +x setup_db.sh && pip install -r requirements.txt && ./setup_db.sh
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    # 빌드: 의존성만 설치
+    buildCommand: pip install -r requirements.txt
+    # 시작: 데이터베이스 확인 후 다운로드, 그 다음 서버 시작
+    startCommand: chmod +x start.sh && ./start.sh
     envVars:
       - key: PYTHON_VERSION
         value: 3.11
